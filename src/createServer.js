@@ -148,11 +148,13 @@ function createServer() {
     } = req.query;
 
     if (userId) {
-      const expensesByUser = expenses.filter(item => item.userId === +userId);
+      const expensesByUser = expenses.filter(expense =>
+        expense.userId === +userId
+      );
 
       if (category) {
-        const expensesByCategory = expensesByUser.filter(item =>
-          item.category === category
+        const expensesByCategory = expensesByUser.filter(expense =>
+          expense.category === category
         );
 
         res.send(expensesByCategory);
@@ -176,6 +178,56 @@ function createServer() {
     }
 
     res.send(expenses);
+  });
+
+  app.get('/expenses/:expenseId', (req, res) => {
+    const { expenseId } = req.params;
+    const foundExpense = expenses.find(expense => expense.id === +expenseId);
+
+    if (!foundExpense) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    res.statusCode = 200;
+    res.send(foundExpense);
+  });
+
+  app.delete('/expenses/:expenseId', (req, res) => {
+    const { expenseId } = req.params;
+    const filteredExpenses = expenses.filter(expense =>
+      expense.id === expenseId
+    );
+
+    if (expenses.length === filteredExpenses.length) {
+      res.sendStatus(404);
+
+      return;
+    };
+
+    expenses = filteredExpenses;
+    res.sendStatus(204);
+  });
+
+  app.patch('/expenses/:expenseId', express.json(), (req, res) => {
+    const { expenseId } = req.params;
+    const { title } = req.body;
+
+    // eslint-disable-next-line no-console
+    console.log(req.body);
+
+    const foundExpense = expenses.find(expense => expense.id === +expenseId);
+
+    if (!expenseId || !foundExpense) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    const modifiedExpense = Object.assign(foundExpense, { title });
+
+    res.send(modifiedExpense);
   });
 
   return app;
