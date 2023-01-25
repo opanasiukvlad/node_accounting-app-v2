@@ -3,7 +3,7 @@
 const express = require('express');
 const cors = require('cors');
 const userService = require('./services/user');
-const userController = require('./controllers/user');
+const { userRouter } = require('./routes/user');
 
 function createServer() {
   // Use express to create a server
@@ -13,18 +13,9 @@ function createServer() {
 
   app.use(cors());
 
-  // eslint-disable-next-line prefer-const
+  app.use('/users', express.json(), userRouter);
+
   let expenses = [];
-
-  app.post('/users', express.json(), userController.create);
-
-  app.get('/users', userController.getAll);
-
-  app.get('/users/:userId', userController.getById);
-
-  app.delete('/users/:userId', userController.remove);
-
-  app.patch('/users/:userId', express.json(), userController.update);
 
   app.post('/expenses', express.json(), (req, res) => {
     const {
