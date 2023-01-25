@@ -2,6 +2,8 @@
 
 const express = require('express');
 const cors = require('cors');
+const userService = require('./services/user');
+const userController = require('./controllers/user');
 
 function createServer() {
   // Use express to create a server
@@ -11,90 +13,18 @@ function createServer() {
 
   app.use(cors());
 
-  let users = [];
   // eslint-disable-next-line prefer-const
   let expenses = [];
 
-  app.post('/users', express.json(), (req, res) => {
-    const { name } = req.body;
+  app.post('/users', express.json(), userController.create);
 
-    if (!name) {
-      res.sendStatus(400);
+  app.get('/users', userController.getAll);
 
-      return;
-    }
+  app.get('/users/:userId', userController.getById);
 
-    const newUser = {
-      id: users.length + 1,
-      name,
-    };
+  app.delete('/users/:userId', userController.remove);
 
-    users.push(newUser);
-
-    res.statusCode = 201;
-    res.send(newUser);
-  });
-
-  app.get('/users', (req, res) => {
-    if (!users) {
-      res.sendStatus(400);
-
-      return;
-    }
-
-    res.send(users);
-  });
-
-  app.get('/users/:userId', (req, res) => {
-    const { userId } = req.params;
-    const foundUser = users.find(user => user.id === +userId);
-
-    if (!foundUser) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    res.statusCode = 200;
-    res.send(foundUser);
-  });
-
-  app.delete('/users/:userId', (req, res) => {
-    const { userId } = req.params;
-    const filteredUsers = users.filter(user => user.id === userId);
-
-    if (users.length === filteredUsers.length) {
-      res.sendStatus(404);
-
-      return;
-    };
-
-    users = filteredUsers;
-    res.sendStatus(204);
-  });
-
-  app.patch('/users/:userId', express.json(), (req, res) => {
-    const { userId } = req.params;
-    const { name } = req.body;
-
-    const foundUser = users.find(user => user.id === +userId);
-
-    if (!userId || !name) {
-      res.sendStatus(400);
-
-      return;
-    };
-
-    if (!foundUser) {
-      res.sendStatus(404);
-
-      return;
-    }
-
-    const modifiedUser = Object.assign(foundUser, { name });
-
-    res.send(modifiedUser);
-  });
+  app.patch('/users/:userId', express.json(), userController.update);
 
   app.post('/expenses', express.json(), (req, res) => {
     const {
@@ -109,13 +39,13 @@ function createServer() {
     const requestIsValid = userId && spentAt && title && amount
     && category && note;
 
-    const userIsValid = users.some(user => user.id === userId);
-
     if (!requestIsValid) {
       res.sendStatus(400);
 
       return;
     }
+
+    const userIsValid = userService.getById(userId);
 
     if (!userIsValid) {
       res.sendStatus(400);
@@ -213,9 +143,6 @@ function createServer() {
   app.patch('/expenses/:expenseId', express.json(), (req, res) => {
     const { expenseId } = req.params;
     const { title } = req.body;
-
-    // eslint-disable-next-line no-console
-    console.log(req.body);
 
     const foundExpense = expenses.find(expense => expense.id === +expenseId);
 
