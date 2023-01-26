@@ -1,6 +1,6 @@
 'use strict';
 
-const userService = require('../services/user');
+const usersService = require('../services/users');
 
 const create = (req, res) => {
   const { name } = req.body;
@@ -11,21 +11,21 @@ const create = (req, res) => {
     return;
   }
 
-  const newUser = userService.create(name);
+  const newUser = usersService.create(name);
 
   res.statusCode = 201;
   res.send(newUser);
 };
 
 const getAll = (req, res) => {
-  const users = userService.getAll();
+  const users = usersService.getAll();
 
   res.send(users);
 };
 
 const getById = (req, res) => {
   const { userId } = req.params;
-  const foundUser = userService.getById(userId);
+  const foundUser = usersService.getById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -39,7 +39,7 @@ const getById = (req, res) => {
 
 const remove = (req, res) => {
   const { userId } = req.params;
-  const foundUser = userService.getById(userId);
+  const foundUser = usersService.getById(userId);
 
   if (!foundUser) {
     res.sendStatus(404);
@@ -47,7 +47,7 @@ const remove = (req, res) => {
     return;
   };
 
-  userService.remove(userId);
+  usersService.remove(userId);
   res.sendStatus(204);
 };
 
@@ -55,7 +55,7 @@ const update = (req, res) => {
   const { userId } = req.params;
   const { name } = req.body;
 
-  const foundUser = userService.getById(userId);
+  const foundUser = usersService.getById(userId);
 
   if (!userId || !name) {
     res.sendStatus(400);
@@ -69,7 +69,7 @@ const update = (req, res) => {
     return;
   }
 
-  userService.update(userId, name);
+  usersService.update(userId, name);
 
   res.send(foundUser);
 };
