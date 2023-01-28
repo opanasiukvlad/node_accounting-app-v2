@@ -38,16 +38,16 @@ function getAll(userId) {
 }
 
 function getById(expenseId) {
-  const expenseById = expenses.filter(expense =>
+  const expenseById = expenses.find(expense =>
     expense.id === +expenseId
   );
 
-  return expenseById;
+  return expenseById || null;
 }
 
 function remove(expenseId) {
   expenses = expenses.filter(expense =>
-    expense.id === expenseId
+    expense.id !== +expenseId
   );
 };
 

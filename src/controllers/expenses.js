@@ -13,15 +13,6 @@ const create = (req, res) => {
     note,
   } = req.body;
 
-  const requestIsValid = userId && spentAt && title && amount
-  && category && note;
-
-  if (!requestIsValid) {
-    res.sendStatus(400);
-
-    return;
-  }
-
   const userIsValid = usersService.getById(userId);
 
   if (!userIsValid) {
@@ -63,15 +54,35 @@ const getAll = (req, res) => {
     return;
   };
 
-  if (from && to) {
-    const expensesByDateTo = expensesByUser.filter(item =>
-      item.spentAt >= from && item.spentAt <= to
+  if (from) {
+    const expensesByDateFrom = expensesByUser.filter(expense =>
+      expense.spentAt >= from
+    );
+
+    if (to) {
+      const expensesByDateTo = expensesByDateFrom.filter(expense =>
+        expense.spentAt <= to
+      );
+
+      res.send(expensesByDateTo);
+
+      return;
+    }
+
+    res.send(expensesByDateFrom);
+
+    return;
+  };
+
+  if (to) {
+    const expensesByDateTo = expensesByUser.filter(expense =>
+      expense.spentAt <= to
     );
 
     res.send(expensesByDateTo);
 
     return;
-  };
+  }
 
   res.send(expensesByUser);
 };
@@ -110,7 +121,13 @@ const update = (req, res) => {
 
   const foundExpense = expensesService.getById(expenseId);
 
-  if (!expenseId || !foundExpense) {
+  if (!expenseId || !title) {
+    res.sendStatus(404);
+
+    return;
+  }
+
+  if (!foundExpense) {
     res.sendStatus(404);
 
     return;

@@ -24,7 +24,7 @@ function getById(userId) {
 }
 
 function remove(userId) {
-  users = users.filter(user => user.id === userId);
+  users = users.filter(user => user.id !== +userId);
 };
 
 function update(userId, name) {

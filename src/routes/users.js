@@ -5,7 +5,7 @@ const usersController = require('../controllers/users');
 
 const usersRouter = express.Router();
 
-usersRouter.post('/', express.json(), usersController.create);
+usersRouter.post('/', usersController.create);
 
 usersRouter.get('/', usersController.getAll);
 
@@ -13,7 +13,7 @@ usersRouter.get('/:userId', usersController.getById);
 
 usersRouter.delete('/:userId', usersController.remove);
 
-usersRouter.patch('/:userId', express.json(), usersController.update);
+usersRouter.patch('/:userId', usersController.update);
 
 module.exports = {
   usersRouter,
